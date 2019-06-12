@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+
+
+
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    
+    <title>Dust Checker!</title>
+   
+    <script src="http://d3js.org/d3.v2.js"></script>
+    <style>
+
+body
+{
+    background-image:url("/static/map.png");
+    background-size:100% 100%;
+}
+
+path.line {
+    fill: none;
+    stroke: #666;
+    stroke-width: 1.5px;
+}
+
+.domain {
+    stroke-width: 1px;
+}
+
+circle {
+    cursor: pointer;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+}
+
+.axis line, .axis path {
+    stroke-width: 1px;
+    stroke: #000;
+    fill: none;
+}
+
+.tooltip {
+    display: none;
+}
+
+.tooltip.active {
+    display: block;
+}
+
+.tooltip rect {
+    fill: #ff0000;
+}
+
+    </style>
+
+</head>
+<body>
+
+    <h1>Dust Checker!</h1>
+    
+    
+    <div id="info">
+        <div id="point-info">
+            Click on a point.
+        </div>
+    </div>
+
+    <div id="plot">
+    </div>
+     
+    <script>
+
+
+        // Set up the plot window.
+      
+        var margin = 100;
+        var w = 1800 - 2 * margin, h = 800 - 2 * margin;
+        var svg = d3.select("#plot").append("svg")
+                        .attr("width", w + 2 * margin)
+                        .attr("height", h + 2 * margin)
+                    .append("svg:g")
+                        .attr("transform", "translate(" + margin + ", " + margin + ")");
+
+        // The colorbar setting
+        var color = d3.scale.quantize()
+                      .range(["blue", "green", "yellow", "red"])
+                      .domain([0, 1]);
+
+        // Axes scaling functions.
+        var xscale = d3.scale.linear().range([0, w]);
+        var yscale = d3.scale.linear().range([h, 0]);
+
+        // The axes objects themselves.
+        var xaxis = d3.svg.axis().scale(xscale).ticks(10)
+        var yaxis = d3.svg.axis().scale(yscale).ticks(10).orient("left");
+
+        // show (x,y) coordinate
+        //svg.append("svg:g").attr("class", "x axis").attr("transform", "translate(0, " + h + ")");
+        //svg.append("svg:g").attr("class", "y axis");
+
+        // Show the information about a particular point.
+        var show_info = function (d) {
+            d3.select("#point-info").text("It has the coordinates (" + d.x + ", " + d.y + ")." 
+            + "PM_1.0 data is" + d.pmdata);
+        };
+
+        // Load the data.
+        var callback = function (data) {
+            // Rescale the axes.
+            
+            xscale.domain([d3.min(data, function (d) { return d.x; }) - 0.05,
+                           d3.max(data, function (d) { return d.x; }) + 0.05]);
+            yscale.domain([d3.min(data, function (d) { return d.y; }) - 0.05,
+                           d3.max(data, function (d) { return d.y; }) + 0.05]);
+
+            // Display the axes.
+            svg.select(".x.axis").call(xaxis);
+            svg.select(".y.axis").call(yaxis);
+
+            // Insert the data points.
+            svg.selectAll("circle").data(data).enter()
+                .append("circle")
+                    .attr("id", function (d) { return d._id; })
+                    .attr("cx", function (d) { return xscale(d.x); })
+                    .attr("cy", function (d) { return yscale(d.y); })
+                    .attr("r", function (d) { return 2 * Math.sqrt(d.pmdata); })
+                    .style("fill", function (d) { return color(d.color); })
+                    .on("mousedown", show_info);
+
+   
+        };
+
+
+        setInterval(function() {
+
+            d3.json("/data", callback);
+        }, 1000);
+
+    </script>
+
+</body>
+</html>
+
+
+
+
