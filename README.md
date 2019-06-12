@@ -7,6 +7,7 @@ ROS를 이용한 turtlebot2의 실시간 미세먼지 데이터 수집 및 datab
 ## 실행 환경(Software)
 
 workstation : VMware workstation Ubuntu 16.04 / ros kinetic
+
 raspberrypi : lubuntu 16.04 / ros kinetic
 
 ## 실행 환경(Hardware)
@@ -26,6 +27,9 @@ ros-kinetic-kobuki*
 ## 소스 출처
 
 아래의 github source를 수정하였음
+
 https://github.com/robopeak/rplidar_ros
+
 https://github.com/oroca/oroca-ros-pkg
+
 http://wiki.ros.org/slam_gmapping
